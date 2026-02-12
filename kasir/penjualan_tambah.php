@@ -1,75 +1,42 @@
+<?php include 'header.php'; ?>
+<?php include '../koneksi.php'; ?>
+
+<div class="container">
+<div class="panel">
+<div class="panel-heading">
+<h4>Tambah Penjualan</h4>
+</div>
+
+<div class="panel-body">
+
+<form action="penjualan_simpan.php" method="POST">
+
+<label>Barang</label>
+<select name="id_barang" class="form-control" required>
+<option value="">Pilih Barang</option>
+
 <?php
-session_start();
-include '../koneksi.php';
+$b = mysqli_query($koneksi,"SELECT * FROM barang");
+while($bb=mysqli_fetch_assoc($b)){
+?>
+<option value="<?= $bb['id_barang'] ?>">
+<?= $bb['nama_barang'] ?> - Rp <?= number_format($bb['harga_jual']) ?>
+</option>
+<?php } ?>
 
-// validasi method
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: penjualan.php");
-    exit;
-}
+</select>
 
-// ambil data
-$id_barang = isset($_POST['id_barang']) ? (int)$_POST['id_barang'] : 0;
-$jumlah    = isset($_POST['jumlah']) ? (int)$_POST['jumlah'] : 1;
+<br>
 
-// minimal beli 1
-if ($jumlah < 1) {
-    $jumlah = 1;
-}
+<label>Total Harga</label>
+<input type="number" name="total_harga" class="form-control" required>
 
-// ambil barang
-$query  = mysqli_query($koneksi, "SELECT * FROM barang WHERE id_barang='$id_barang'");
-$barang = mysqli_fetch_assoc($query);
+<br>
 
-// jika barang tidak ada
-if (!$barang) {
-    header("Location: penjualan.php?pesan=barang_tidak_ada");
-    exit;
-}
+<button class="btn btn-success">Simpan</button>
 
-// cek stok
-if ($barang['stok'] < $jumlah) {
-    header("Location: penjualan.php?pesan=stok_kurang");
-    exit;
-}
+</form>
 
-// buat cart jika belum ada
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
-$found = false;
-
-// cek apakah barang sudah ada
-foreach ($_SESSION['cart'] as $key => $item) {
-
-    if ($item['id_barang'] == $id_barang) {
-
-        $total_jumlah = $item['jumlah'] + $jumlah;
-
-        // cek stok total
-        if ($total_jumlah > $barang['stok']) {
-            header("Location: penjualan.php?pesan=stok_kurang");
-            exit;
-        }
-
-        $_SESSION['cart'][$key]['jumlah'] = $total_jumlah;
-        $found = true;
-        break;
-    }
-}
-
-// jika belum ada → tambah
-if (!$found) {
-
-    $_SESSION['cart'][] = [
-        'id_barang'   => $id_barang,
-        'nama_barang' => $barang['nama_barang'],
-        'harga'       => $barang['harga_jual'],
-        'jumlah'      => $jumlah
-    ];
-}
-
-// balik ke kasir
-header("Location: penjualan.php");
-exit;
+</div>
+</div>
+</div>

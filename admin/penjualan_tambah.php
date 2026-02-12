@@ -1,58 +1,43 @@
+<?php include 'header.php'; ?>
+<?php include '../koneksi.php'; ?>
+
+<div class="container">
+<div class="panel">
+<div class="panel-heading">
+<h4>Tambah Penjualan</h4>
+</div>
+
+<div class="panel-body">
+
+<form method="post" action="penjualan_simpan.php">
+
+<div class="form-group">
+<label>Barang</label>
+<select name="barang" class="form-control" required>
+
+<option value="">-- Pilih Barang --</option>
+
 <?php
-session_start();
-include '../koneksi.php';
+$b = mysqli_query($koneksi,"SELECT * FROM barang");
+while($br = mysqli_fetch_array($b)){
+?>
+<option value="<?= $br['id_barang']; ?>">
+<?= $br['nama_barang']; ?>
+</option>
+<?php } ?>
 
-// ambil data
-$id_barang = (int) $_POST['id_barang'];
-$jumlah    = (int) $_POST['jumlah'];
+</select>
+</div>
 
-// validasi jumlah
-if ($jumlah < 1) {
-    $jumlah = 1;
-}
+<div class="form-group">
+<label>Total Harga</label>
+<input type="number" name="total" class="form-control" required>
+</div>
 
-// ambil data barang
-$query = mysqli_query($koneksi, "SELECT * FROM barang WHERE id_barang='$id_barang'");
-$barang = mysqli_fetch_assoc($query);
+<button class="btn btn-success">Simpan</button>
 
-// cek stok
-if ($barang['stok'] < $jumlah) {
-    header("Location: penjualan.php?pesan=stok_kurang");
-    exit;
-}
+</form>
 
-// jika cart belum ada
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
-// cek apakah barang sudah ada di cart
-$found = false;
-foreach ($_SESSION['cart'] as $key => $item) {
-    if ($item['id_barang'] == $id_barang) {
-
-        // cek stok total
-        $total_jumlah = $_SESSION['cart'][$key]['jumlah'] + $jumlah;
-        if ($total_jumlah > $barang['stok']) {
-            header("Location: penjualan.php?pesan=stok_kurang");
-            exit;
-        }
-
-        $_SESSION['cart'][$key]['jumlah'] += $jumlah;
-        $found = true;
-        break;
-    }
-}
-
-// kalau belum ada di cart → tambahkan
-if (!$found) {
-    $_SESSION['cart'][] = [
-        'id_barang'   => $id_barang,
-        'nama_barang' => $barang['nama_barang'],
-        'harga'       => $barang['harga_jual'],
-        'jumlah'      => $jumlah
-    ];
-}
-
-header("Location: penjualan.php");
-exit;
+</div>
+</div>
+</div>

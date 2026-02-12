@@ -165,8 +165,6 @@ body{
         >
 
     </div>
-
-
     <table class="table table-bordered table-striped shadow-sm" id="tabelBarang">
         <thead class="text-center">
             <tr>
@@ -236,6 +234,5 @@ document.getElementById("search").addEventListener("keyup", function() {
 
 });
 </script>
-
 
 <?php include '../footer.php'; ?>
